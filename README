@@ -1,0 +1,13 @@
+Interesting queries:
+
+Informatizacija:
+http://127.0.0.1/proracun/index.php?nameq=&typecode=1&parent=-1
+
+Informatizacija,  Rashodi za nabavu neproizvedene imovine
+http://127.0.0.1/proracun/index.php?nameq=&code=41&parent=-1&typecode=1
+
+Rashodi za nabavu neproizvedene imovine
+http://127.0.0.1/proracun/index.php?nameq=&code=41&parent=-1
+
+Sve šifre koje počinju sa A:
+http://127.0.0.1/proracun/index.php?nameq=&codeq=A&parent=-1
