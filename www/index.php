@@ -36,7 +36,11 @@ function getDetailById($id) {
 <div class="root">
 	<a class="ui-state-default ui-corner-all" href="index.php">Root</a>
         <a class="ui-state-default ui-corner-all" href="index.php?interesting=1">Zanimljivo</a>
+        <a class="ui-state-default ui-corner-all" href="http://mfin.hr/hr/drzavni-proracun-2010" target="_blank">Source data</a>
+        <a class="ui-state-default ui-corner-all" href="http://github.com/vrodic/BudgetSQL" target="_blank">Source code</a>
+        
          <a class="ui-state-default ui-corner-all" href="index.php?donate=1">Doniraj</a>
+         
 
 </div>
 <table>
