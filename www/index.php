@@ -138,6 +138,8 @@ if ($interesting) {
 if ($donate) {
 ?>
 <br>
+    Komentare i sugestije šaljite <a href="mailto:vrodic@gmail.com">Vedranu Rodiću</a><br><br>
+        
     Donirajte na autorov tekući račun Zagrebačke banke:<br>
 Broj banke: <b>2360000-1000000013</b><br> 
 Model: <b>17</b><br>
