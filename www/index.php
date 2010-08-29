@@ -36,6 +36,7 @@ function getDetailById($id) {
 <div class="root">
 	<a class="ui-state-default ui-corner-all" href="index.php">Root</a>
         <a class="ui-state-default ui-corner-all" href="index.php?interesting=1">Zanimljivo</a>
+         <a class="ui-state-default ui-corner-all" href="index.php?donate=1">Doniraj</a>
 
 </div>
 <table>
@@ -83,6 +84,7 @@ setlocale(LC_ALL,"en_US.utf8");
 $parent = $_GET["parent"];
 $codeq = $_GET["codeq"];
 $nosubitem = $_GET["nosubitem"];
+$donate = $_GET["donate"];
 $parentmid = $_GET["parentmid"];
 $parentfine = $_GET["parentfine"];
 $typecode = $_GET["typecode"];
@@ -127,6 +129,18 @@ if ($interesting) {
     }
     echo "</table>";
     
+}
+
+if ($donate) {
+?>
+<br>
+    Donirajte na autorov tekući račun Zagrebačke banke:<br>
+Broj banke: <b>2360000-1000000013</b><br> 
+Model: <b>17</b><br>
+Poziv na broj: <b>3218176032</b><br>
+Pod napomenu stavite: <b>Budget surfer</b><br>
+<?
+
 }
 
 if ($nameq) {
@@ -184,7 +198,7 @@ if ($parentmid) {
     $sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
    
     $res = pg_query($sql);
-        echo $sql."<br>";
+      //  echo $sql."<br>";
    
 
 $totalp = 0;
