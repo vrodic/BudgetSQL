@@ -83,6 +83,7 @@ setlocale(LC_ALL,"en_US.utf8");
 $parent = $_GET["parent"];
 $codeq = $_GET["codeq"];
 $nosubitem = $_GET["nosubitem"];
+$parentmid = $_GET["parentmid"];
 $parentfine = $_GET["parentfine"];
 $typecode = $_GET["typecode"];
 $orderf = $_GET["orderf"];
@@ -99,7 +100,7 @@ $nameq = strtr($nameq, 'čćžšđ','ČĆŽŠĐ' ); // if anybody knows a better
     <input type="submit" class="root" value="+ Zanimljivo">
    <input type="hidden" name="params"
         value="<?
-        $val = "parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv";
+        $val = "parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv";
         $val = str_replace(" ", "+", $val);
         echo $val;
         ?>">
@@ -114,6 +115,7 @@ if ($zname) {
     pg_query($sql);
     $interesting = 1;
 }
+
 if ($interesting) {
     $sql = "SELECT name, params FROM interesting order by clickcnt";
     $res = pg_query($sql); 
@@ -159,9 +161,15 @@ if ($orderf) {
 
 if ($parentfine) {
     $where .= "and parentfine='$parentfine' ";
-} else if ((! $code && ! $codeq &&  $parent < 0) || $nosubitem){
+}
+
+if ($nosubitem){
     $where .= "and subitem='0' ";
 }
+
+if ($parentmid) {
+    $where .= "and parentmid='$parentmid' ";
+} 
 
     if ($code) {
         $where .= " and code='$code' ";
@@ -176,7 +184,7 @@ if ($parentfine) {
     $sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
    
     $res = pg_query($sql);
-       // echo $sql."<br>";
+        echo $sql."<br>";
    
 
 $totalp = 0;
@@ -204,6 +212,20 @@ if ($parentfine) {
         echo "<b>$pname</b><br>";
 }
 
+if ($parentmid) {
+        $res3 = getDetailByCode($parentmid);
+        $pname = pg_result($res3,0,1);
+        $pparent = pg_result($res3,0,2);
+        if ($parent < 0) {
+            $res4 = getDetailById($pparent);
+
+            $ppname = pg_result($res4,0,1);
+            echo "<b><a href=index.php?parent=$pparent>$ppname</a></b><br>";
+        }
+        echo "<b>$pname</b><br>";
+}
+
+
 if ($parent < 1 && ! $parentfine) {
     $totalp = 1;
  $sql = "SELECT sum(amount1),sum(amount2),sum(amount3)  FROM MainItems $fullwhere ";
@@ -225,7 +247,7 @@ if ($parent < 1 && ! $parentfine) {
         
     <tr><td><b>Šifra</b></td><td><b>Naziv stavke</b></td><? echo $totalph;?><td align=right><b>
     <?
-    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv'>
+    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv'>
     Iznos 2010</a>";
     ?>
     </b></td><td align=right><b>Iznos 2011</b></td><td align=right><b>Iznos 2012</b></td></b></tr>
@@ -276,9 +298,8 @@ if ($parent < 1 && ! $parentfine) {
         }
         }
         if ($row['subitem'] == 0 && $magic != "A" && $magic !="K" && $parent != 0) {
-            
-            $ahref = "<b>";
-            $aterm = "</b>";
+                    $ahref ="<a href='index.php?parent=-2&parentmid=".$row['code']."'>";
+            $aterm = "</a>";
         }
         
         $name = $row['name'];
