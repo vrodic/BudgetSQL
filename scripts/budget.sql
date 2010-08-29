@@ -4,6 +4,7 @@ CREATE TABLE MainItems(
   parentfine varchar(200),
   name varchar(255),
   parent int,
+  parentmid varchar(20),
   subitem int,
   typecode int,
   amount1 bigint,

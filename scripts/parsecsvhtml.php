@@ -63,10 +63,17 @@ echo "OK\n";
                         $root = 0;
                          $setroot = 1;
                          $parentfine = "NULL";
+                         $parentmid = "NULL";
+                        } else {
+                            if ($magic != "A" && $magic != "B") {
+                                $parentmid = "NULL";
+                                $newparentmid = "'$sifra'";
+                            }
                         }
                         $subitem = 0;
                         $type = "NULL";
                          $parentfine = "NULL";
+                         
                         $newparentfine = "'$sifra'";
                        
                     } else {
@@ -100,9 +107,13 @@ echo "OK\n";
             //$setroot = 0;
         }
        
-           $sql = "INSERT INTO MainItems (code,name,parent,amount1,amount2,amount3,typecode,subitem,parentfine) VALUES ('$sifra','$name','$root',$amount1,$amount2,$amount3,$type,'$subitem',$parentfine);";
+           $sql = "INSERT INTO MainItems (code,name,parent,amount1,amount2,amount3,typecode,subitem,parentfine,parentmid)
+           VALUES ('$sifra','$name','$root',$amount1,$amount2,$amount3,$type,'$subitem',$parentfine,$parentmid);";
         if ($newparentfine != $parentfine) {
             $parentfine = $newparentfine;
+        }
+          if ($newparentmid != $parentmid) {
+            $parentmid = $newparentmid;
         }
      echo $sql."\n";
       pg_query($sql);
