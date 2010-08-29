@@ -7,26 +7,13 @@
     <link rel="stylesheet" type="text/css" href="include/css/ui-lightness/jquery-ui-1.8.4.custom.css" /> 
 </head>
 <body>
+<script type="text/javascript">
+	$(function() {
     
-
-<div class="demo">
-
-	<div id="progressbar"></div>
-
-</div><!-- End demo -->
-<b>Proračun</b><br>   
-<form action=index.php method="GET">
-    Pretraži: <input type="text" name="nameq" value="">
-<form>
-    
-<form action=index.php method="GET">
-    Po tipu: <select name="typecode">
-    <option value=-1>Bez tipa</option>
-    <option value=1>Informatizacija</option>
-    </select>
-     <input type="hidden" name="parent" value="-1">
-    <input type="submit" value="Tip">
-<form><br>
+		$("a, input:submit", ".root").button();
+		
+	});
+</script>
 
 <?php
 require("include/dbcon.inc");
@@ -35,9 +22,63 @@ function fmoney($num) {
 }
 
 function getDetailByCode($code) {
-     $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE code='$code'";
+     $sql = "SELECT id, name, parent,amount1,amount2,amount3 FROM MainItems WHERE code='$code'";
     return pg_query($sql);
 }
+function getDetailById($id) {
+     $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$id'";
+    return pg_query($sql);
+}
+
+?>
+
+
+<div class="root">
+	<a class="ui-state-default ui-corner-all" href="index.php">Root</a>
+        <a class="ui-state-default ui-corner-all" href="index.php?interesting=1">Zanimljivo</a>
+
+</div>
+<table>
+    <tr>
+        <td>
+<form id="search" action=index.php method="GET">
+    Pretraži: <input type="text" name="nameq" value="">
+      <input type="hidden" name="parent" value="-1">
+</form>
+        </td>
+<td>
+<form action=index.php method="GET">
+    Po tipu: <select name="typecode">
+    <option value=-1>Bez tipa</option>
+    <option value=1>Informatizacija</option>
+    </select>
+     <input type="hidden" name="parent" value="-1">
+    <input type="submit" class="root" value="Tip">
+</form>
+</td>
+<td>
+   <form action=index.php method="GET">
+    Po šifri: <select name="code">
+    <?
+    $sql = "SELECT distinct name, code FROM MainItems where subitem=1 order by code;";
+    $res = pg_query($sql);
+     while ($row = pg_fetch_assoc($res)) {
+        $cname = $row['name'];
+        if (strlen($cname) > 35 ) $cname = substr($cname,0,32)."...";
+        $ccode = $row['code'];
+        echo " <option value=$ccode>$cname</option>";
+     }
+     
+    ?>
+   
+    </select>
+     <input type="hidden" name="parent" value="-1">
+    <input type="submit" class="root" value="Tip">
+</form>
+</td> 
+</td>
+    
+<?
 setlocale(LC_ALL,"en_US.utf8");
 $parent = $_GET["parent"];
 $codeq = $_GET["codeq"];
@@ -47,8 +88,44 @@ $typecode = $_GET["typecode"];
 $orderf = $_GET["orderf"];
 $orderv = $_GET["orderv"];
 $code = $_GET["code"];
+$interesting = $_GET["interesting"];
+$zname = pg_escape_string($_POST["zname"]);
 $nameq = mb_strtoupper($_GET["nameq"]);
 $nameq = strtr($nameq, 'čćžšđ','ČĆŽŠĐ' ); // if anybody knows a better alternative to uppercase croatian characters, please shout 
+?>
+<td>
+<form id="addint" action=index.php method="POST">
+    Ime:<input type="text" name="zname" value="">
+    <input type="submit" class="root" value="+ Zanimljivo">
+   <input type="hidden" name="params"
+        value="<?
+        $val = "parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv";
+        $val = str_replace(" ", "+", $val);
+        echo $val;
+        ?>">
+</form>
+</td>
+    </tr></table>
+<?
+if ($zname) {
+    $zparams = pg_escape_string($_POST['params']);
+    $sql = "INSERT INTO Interesting (name, params) VALUES('$zname','$zparams')";
+    //echo $sql;
+    pg_query($sql);
+    $interesting = 1;
+}
+if ($interesting) {
+    $sql = "SELECT name, params FROM interesting order by clickcnt";
+    $res = pg_query($sql); 
+    echo "<table>";
+    while ($row = pg_fetch_assoc($res)) {
+        $name = $row['name'];
+        $params = $row['params'];
+        echo "<tr><td><a href=index.php?$params>$name</a></td><td></td></tr>";
+    }
+    echo "</table>";
+    
+}
 
 if ($nameq) {
     $where .= " and upper(name) like '%$nameq%' ";
@@ -99,7 +176,7 @@ if ($parentfine) {
     $sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
    
     $res = pg_query($sql);
-    //    echo $sql."<br>";
+        echo $sql."<br>";
    
 
 $totalp = 0;
@@ -107,18 +184,23 @@ $totalph = "";
     
 
 if ($parent > 0) {
-        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$parent'";
-        $res3 = pg_query($sql);
+        $res3 = getDetailById($parent);
         $pname = pg_result($res3,0,1);
         echo "<br><b>$pname</b><br>";
-              $totaluf = pg_result($res3,0,3);
+        $totaluf = pg_result($res3,0,3);
         $total = fmoney($totaluf);
         $totalp = 1;
 }
 if ($parentfine) {
-        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE code='$parentfine'";
-        $res3 = pg_query($sql);
+        $res3 = getDetailByCode($parentfine);
         $pname = pg_result($res3,0,1);
+        $pparent = pg_result($res3,0,2);
+        if ($parent < 0) {
+            $res4 = getDetailById($pparent);
+
+            $ppname = pg_result($res4,0,1);
+            echo "<b><a href=index.php?parent=$pparent>$ppname</a></b><br>";
+        }
         echo "<b>$pname</b><br>";
 }
 
@@ -143,7 +225,7 @@ if ($parent < 1 && ! $parentfine) {
         
     <tr><td><b>Šifra</b></td><td><b>Naziv stavke</b></td><? echo $totalph;?><td align=right><b>
     <?
-    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv'>
+    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$ &codeq=$codeq&orderf=1&orderv=$orderv'>
     Iznos 2010</a>";
     ?>
     </b></td><td align=right><b>Iznos 2011</b></td><td align=right><b>Iznos 2012</b></td></b></tr>
@@ -184,7 +266,7 @@ if ($parent < 1 && ! $parentfine) {
         echo "<td bgcolor=$col>";
         $aterm = "";
         $ahref = "";
-        if ($row['subitem'] == 0 && ($magic == "A" || $magic == "K")) {
+        if (($row['subitem'] == 0 && ($magic == "A" || $magic == "K")) || $parent == 0) {
         if ($parent > 0 || $parent < 0) {
             $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
             $aterm = "</a>";
@@ -193,7 +275,7 @@ if ($parent < 1 && ! $parentfine) {
             $aterm = "</a>";
         }
         }
-        if ($row['subitem'] == 0 && $magic != "A" && $magic !="K") {
+        if ($row['subitem'] == 0 && $magic != "A" && $magic !="K" && $parent != 0) {
             
             $ahref = "<b>";
             $aterm = "</b>";

@@ -17,3 +17,15 @@ CREATE TABLE ItemValuesYears (
   amount int
 );
 
+CREATE TABLE Interesting(
+    id SERIAL,
+    name varchar(255),
+    params text UNIQUE,
+    clickcnt int DEFAULT '0'
+);
+
+INSERT INTO Interesting (name, params) VALUES('Informatizacija','nameq=&typecode=1&parent=-1');
+INSERT INTO Interesting (name, params) VALUES('Informatizacija,  Rashodi za nabavu neproizvedene imovine','nameq=&code=41&parent=-1&typecode=1');
+INSERT INTO Interesting (name, params) VALUES('Rashodi za nabavu neproizvedene imovine','nameq=&code=41&parent=-1');
+INSERT INTO Interesting (name, params) VALUES('Sve šifre koje počinju sa A','nameq=&codeq=A&parent=-1');
+INSERT INTO Interesting (name, params) VALUES('Duhovna pomoć','nameq=duhovna+pomoć&typecode=-1&parent=-1');
