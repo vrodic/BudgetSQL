@@ -225,7 +225,7 @@ if ($parent < 1 && ! $parentfine) {
         
     <tr><td><b>Šifra</b></td><td><b>Naziv stavke</b></td><? echo $totalph;?><td align=right><b>
     <?
-    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$ &codeq=$codeq&orderf=1&orderv=$orderv'>
+    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv'>
     Iznos 2010</a>";
     ?>
     </b></td><td align=right><b>Iznos 2011</b></td><td align=right><b>Iznos 2012</b></td></b></tr>
@@ -283,7 +283,7 @@ if ($parent < 1 && ! $parentfine) {
         
         $name = $row['name'];
         $spcname= "";
-        if($row['subitem'] == "1") {
+        if($row['subitem'] == "1" && $parent > 0 ) {
             
             if ($orderf) {
                 $res3 = getDetailByCode($parentfinea);
