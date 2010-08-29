@@ -26,6 +26,7 @@ function fmoney($num) {
 setlocale(LC_ALL,"en_US.utf8");
 $parent = $_GET["parent"];
 $codeq = $_GET["codeq"];
+$nosubitem = $_GET["nosubitem"];
 $parentfine = $_GET["parentfine"];
 $typecode = $_GET["typecode"];
 $code = $_GET["code"];
@@ -54,7 +55,7 @@ if ($parent == 0 || $parent == -1) {
 
 if ($parentfine) {
     $where .= "and parentfine='$parentfine' ";
-} else if (! $code && ! $codeq &&  $parent < 0 ){
+} else if ((! $code && ! $codeq &&  $parent < 0) || $nosubitem){
     $where .= "and subitem='0' ";
 }
 
@@ -124,19 +125,24 @@ if ($parent < 1) {
         $res3 = pg_query($sql);
         $pname = pg_result($res3,0,1);
         $pcode = pg_result($res3,0,2);
-        echo "<tr><td bgcolor=$col>$pcode</td><td  bgcolor=$col><b>$pname</b></td></tr>";
+         $ahref = "<a href='index.php?parent=".$parenta."'>";
+                $aterm = "</a>";
+        echo "<tr><td bgcolor=$col>$pcode</td><td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
           
           if (! $codeq) {
             $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE code='$parentfinea'";
             $res3 = pg_query($sql);
             $pname = pg_result($res3,0,1);
             $pcode = pg_result($res3,0,2);
-            echo "<tr><td  bgcolor=$col>$pcode</td><td  bgcolor=$col><b>$pname</b></td></tr>";
+             $ahref ="<a href='index.php?parent=-2&parentfine=".$parentfinea."'>";
+                       $aterm = "</a>";
+            echo "<tr><td  bgcolor=$col>$pcode</td><td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
           }
         }
         echo "<tr><td bgcolor=$col>$codea</td>";
         echo "<td bgcolor=$col>";
         $aterm = "";
+        $ahref = "";
         if ($parent > 0) {
             
                        $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
