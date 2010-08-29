@@ -6,4 +6,5 @@
 #as postgres superuser
 createuser budget
 createdb  -U budget budget
+psql -U budget budget < budget.sql
 
