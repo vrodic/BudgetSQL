@@ -99,7 +99,7 @@ if ($parentfine) {
     $sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
    
     $res = pg_query($sql);
-        echo $sql."<br>";
+    //    echo $sql."<br>";
    
 
 $totalp = 0;
