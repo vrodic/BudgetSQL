@@ -77,13 +77,13 @@ if ($parentfine) {
     
 
 if ($parent > 0) {
-          $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$parent'";
+        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$parent'";
         $res3 = pg_query($sql);
         $pname = pg_result($res3,0,1);
         echo "<b>$pname</b><br>";
 }
 if ($parentfine) {
-          $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE code='$parentfine'";
+        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE code='$parentfine'";
         $res3 = pg_query($sql);
         $pname = pg_result($res3,0,1);
         echo "<b>$pname</b><br>";
@@ -134,8 +134,8 @@ if ($parent < 1) {
             $res3 = pg_query($sql);
             $pname = pg_result($res3,0,1);
             $pcode = pg_result($res3,0,2);
-             $ahref ="<a href='index.php?parent=-2&parentfine=".$parentfinea."'>";
-                       $aterm = "</a>";
+            $ahref ="<a href='index.php?parent=-2&parentfine=".$parentfinea."'>";
+            $aterm = "</a>";
             echo "<tr><td  bgcolor=$col>$pcode</td><td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
           }
         }
@@ -143,17 +143,17 @@ if ($parent < 1) {
         echo "<td bgcolor=$col>";
         $aterm = "";
         $ahref = "";
-        if ($parent > 0) {
-            
-                       $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
-                       $aterm = "</a>";
+        if ($row['subitem'] == 0) {
+        if ($parent > 0 || $parent < 0) {
+            $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
+            $aterm = "</a>";
         } else if ($parent==0){
-                $ahref = "<a href='index.php?parent=".$row['id']."'>";
-                $aterm = "</a>";
+            $ahref = "<a href='index.php?parent=".$row['id']."'>";
+            $aterm = "</a>";
         }
-        
-         $name = $row['name'];
-         $spcname= "";
+        }
+        $name = $row['name'];
+        $spcname= "";
         if($row['subitem'] == "1") {
             $spcname = "&nbsp;&nbsp;";
         } 
