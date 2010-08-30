@@ -30,3 +30,9 @@ INSERT INTO Interesting (name, params) VALUES('Informatizacija,  Rashodi za naba
 INSERT INTO Interesting (name, params) VALUES('Rashodi za nabavu neproizvedene imovine','nameq=&code=41&parent=-1');
 INSERT INTO Interesting (name, params) VALUES('Sve šifre koje počinju sa A','nameq=&codeq=A&parent=-1');
 INSERT INTO Interesting (name, params) VALUES('Duhovna pomoć','nameq=duhovna+pomoć&typecode=-1&parent=-1');
+
+create index codeidx on MainItems  (code);
+create index parentidx on MainItems  (parent);
+create index parentmididx on MainItems  (parentmid);
+create index parentfineidx on MainItems  (parentfine);
+create index typecodeidx on MainItems  (typecode);

@@ -58,7 +58,8 @@ function getDetailById($id) {
     <option value=1>Informatizacija</option>
     </select>
      <input type="hidden" name="parent" value="-1">
-    <input type="submit" class="root" value="Tip">
+	<input type="hidden" name="nosubitem" value="1">
+    <input type="submit" class="root" value="Upit">
 </form>
 </td>
 <td>
@@ -78,7 +79,7 @@ function getDetailById($id) {
    
     </select>
      <input type="hidden" name="parent" value="-1">
-    <input type="submit" class="root" value="Tip">
+    <input type="submit" class="root" value="Upit">
 </form>
 </td> 
 </td>
@@ -106,7 +107,7 @@ $nameq = strtr($nameq, 'čćžšđ','ČĆŽŠĐ' ); // if anybody knows a better
     <input type="submit" class="root" value="+ Zanimljivo">
    <input type="hidden" name="params"
         value="<?
-        $val = "parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv";
+        $val = "parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv&nosubitem=$nosubitem";
         $val = str_replace(" ", "+", $val);
         echo $val;
         ?>">
@@ -267,7 +268,7 @@ if ($parent < 1 && ! $parentfine) {
         
     <tr><td><b>Šifra</b></td><td><b>Naziv stavke</b></td><? echo $totalph;?><td align=right><b>
     <?
-    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv'>
+    echo "<a href='index.php?parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv&nosubitem=$nosubitem'>
     Iznos 2010</a>";
     ?>
     </b></td><td align=right><b>Iznos 2011</b></td><td align=right><b>Iznos 2012</b></td></b></tr>
@@ -346,7 +347,7 @@ if ($parent < 1 && ! $parentfine) {
 		});
                 $(\"#pbar$cnt\").height(20);
                 ";
-        echo "<td><div id='pbar$cnt'></div>".number_format($percent,2)."</td>";  
+        echo "<td bgcolor=$col><div id='pbar$cnt'></div>".number_format($percent,2)."</td>";  
       }
       
   echo "<td align='right'  bgcolor=$col>".$amount1."</td>";
