@@ -16,7 +16,9 @@
 </script>
 
 <?php
+require("include/mediawiki.inc");
 require("include/dbcon.inc");
+
 function fmoney($num) {
     return number_format($num,0,".",",");
 }
@@ -37,11 +39,8 @@ function getDetailById($id) {
 	<a class="ui-state-default ui-corner-all" href="index.php">Root</a>
         <a class="ui-state-default ui-corner-all" href="index.php?interesting=1">Zanimljivo</a>
         <a class="ui-state-default ui-corner-all" href="http://mfin.hr/hr/drzavni-proracun-2010" target="_blank">Source data</a>
-        <a class="ui-state-default ui-corner-all" href="http://github.com/vrodic/BudgetSQL" target="_blank">Source code</a>
-        
-         <a class="ui-state-default ui-corner-all" href="index.php?donate=1">Doniraj</a>
-         
-
+        <a class="ui-state-default ui-corner-all" href="http://github.com/vrodic/BudgetSQL" target="_blank">Source code</a>        
+        <a class="ui-state-default ui-corner-all" href="index.php?donate=1">Doniraj</a>        
 </div>
 <table>
     <tr>
@@ -87,6 +86,7 @@ function getDetailById($id) {
 <?
 setlocale(LC_ALL,"en_US.utf8");
 $parent = $_GET["parent"];
+$id = $_GET["id"];
 $codeq = $_GET["codeq"];
 $nosubitem = $_GET["nosubitem"];
 $donate = $_GET["donate"];
@@ -159,6 +159,23 @@ if ($codeq) {
 }
 
 
+if ($id) {
+   $where .= "and id='$id' ";
+   $sql = "SELECT parentfine, parentmid, parent FROM MainItems WHERE id='$id'";
+   $res0 = pg_query($sql);
+   $parentfine = pg_result($res0,0,0);
+   $parentmid = pg_result($res0,0,1);
+   $parent = pg_result($res0,0,2);
+   echo "$parent $parentmid $parentfine <Br>";
+   if ($parentfine) {
+	$parentmid = "";
+   }
+   if ($parentmid || $parentfine) {
+	$parent = "-2";
+   }
+}
+
+
 if ($parent == "") $parent = 0;
 if ($parent >=0) {
     $where .= " and parent='$parent' ";
@@ -192,20 +209,20 @@ if ($parentmid) {
     $where .= "and parentmid='$parentmid' ";
 } 
 
-    if ($code) {
+if ($code) {
         $where .= " and code='$code' ";
-    }
+}
 
 
-    $fullwhere = " WHERE amount1 is not null $where ";
+$fullwhere = " WHERE amount1 is not null $where ";
     
-    if ($typecode > 0) {
+if ($typecode > 0) {
         $fullwhere = " WHERE typecode='$typecode' and amount1 is not null $where";
-    }
-    $sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
+}
+$sql = "SELECT id, name, code,amount1,amount2,amount3,parent,parentfine,subitem  FROM MainItems $fullwhere ORDER BY $order";
    
-    $res = pg_query($sql);
-      //  echo $sql."<br>";
+$res = pg_query($sql);
+//  echo $sql."<br>";
    
 
 $totalp = 0;
@@ -215,11 +232,12 @@ $totalph = "";
 if ($parent > 0) {
         $res3 = getDetailById($parent);
         $pname = pg_result($res3,0,1);
-        echo "<br><b>$pname</b><br>";
+        echo "<br><b><a href=index.php?parent=$parent>$pname</a></b><br>";
         $totaluf = pg_result($res3,0,3);
         $total = fmoney($totaluf);
         $totalp = 1;
 }
+
 if ($parentfine) {
         $res3 = getDetailByCode($parentfine);
         $pname = pg_result($res3,0,1);
@@ -255,23 +273,30 @@ if ($parent < 1 && ! $parentfine) {
     $totaluf = pg_result($res2,0,0);
     $total = fmoney($totaluf);
 }
+
+	$vline = "<td width=\"1\" bgcolor=\"#000000\"><img src=\"img/1-1.gif\" width=\"1\"
+height=\"1\" border=\"0\" alt=\"\" /></td>";
     ?>
     
     
-    <table>
+    <table CELLSPACING=0 CELLPADDING=0>
         <?
         if ($totalp) {
-        echo "<tr><td></td><td></td><td></td><td align=right><b>Total: </b>$total<br></td><td></td><td></td></tr>";
-        $totalph = "<td>% od ukupnog </td>";
+        echo "<tr><td></td>$vline<td></td><td></td><td><td></td></td>$vline<td align=right><b>Total: </b>$total&nbsp;</td>$vline<td></td>$vline<td></td></tr>";
+	?>
+	<tr><td colspan='12' bgcolor="#000000"><img src="img/transparent.gif" width="1" height="1" border="0"></td></tr>
+	<?
+        $totalph = "$vline<td>% od ukupnog </td>";
         }
         ?>
         
-    <tr><td><b>Šifra</b></td><td><b>Naziv stavke</b></td><? echo $totalph;?><td align=right><b>
+    <tr><td><b>Šifra&nbsp;</b></td><? echo $vline;?><td><b>Naziv stavke&nbsp;</b></td><td><b></b></td><? echo $totalph.$vline;?><td align=right><b>
     <?
     echo "<a href='index.php?parent=$parent&parentfine=$parentfine&parentmid=$parentmid&typecode=$typecode&code=$code&nameq=$nameq&codeq=$codeq&orderf=1&orderv=$orderv&nosubitem=$nosubitem'>
-    Iznos 2010</a>";
+    &nbsp;Iznos 2010&nbsp;</a>";
     ?>
-    </b></td><td align=right><b>Iznos 2011</b></td><td align=right><b>Iznos 2012</b></td></b></tr>
+    </b></td><? echo $vline;?><td align=right><b>&nbsp;Iznos 2011&nbsp;</b></td><? echo $vline;?><td align=right><b>&nbsp;Iznos 2012&nbsp;</b></td></b></tr>
+    <tr><td colspan='12' bgcolor="#000000"><img src="img/transparent.gif" width="1" height="1" border="0"></td></tr>
     <?
     $cnt = 0;
     while ($row = pg_fetch_assoc($res)) {
@@ -281,45 +306,44 @@ if ($parent < 1 && ! $parentfine) {
         } else {
             $col = "#dddddd";
         }
-         $parenta = $row['parent'];
-          $codea = $row['code'];
-          $magic = substr($codea,0,1);
-          $parentfinea = $row['parentfine'];
-          if ($parent == -1 ) {
-           
-          
-        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$parenta'";
-        $res3 = pg_query($sql);
-        $pname = pg_result($res3,0,1);
-        $pcode = pg_result($res3,0,2);
-         $ahref = "<a href='index.php?parent=".$parenta."'>";
+        $parenta = $row['parent'];
+        $codea = $row['code'];
+        $magic = substr($codea,0,1);
+        $parentfinea = $row['parentfine'];
+        if ($parent == -1 ) {
+	        $sql = "SELECT id, name, code,amount1,amount2,amount3 FROM MainItems WHERE id='$parenta'";
+	        $res3 = pg_query($sql);
+	        $pname = pg_result($res3,0,1);
+	        $pcode = pg_result($res3,0,2);
+	        $ahref = "<a href='index.php?parent=".$parenta."'>";
                 $aterm = "</a>";
-        echo "<tr><td bgcolor=$col>$pcode</td><td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
+		echo "<tr><td bgcolor=$col>$pcode</td>$vline<td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
           
-          if (! $codeq) {
-            $res3 = getDetailByCode($parentfinea);
-            $pname = pg_result($res3,0,1);
-            $pcode = pg_result($res3,0,2);
-            $ahref ="<a href='index.php?parent=-2&parentfine=".$parentfinea."'>";
-            $aterm = "</a>";
-            echo "<tr><td  bgcolor=$col>$pcode</td><td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
-          }
+		if (! $codeq) {
+			$res3 = getDetailByCode($parentfinea);
+			$pname = pg_result($res3,0,1);
+			$pcode = pg_result($res3,0,2);
+			$ahref ="<a href='index.php?parent=-2&parentfine=".$parentfinea."'>";
+			$aterm = "</a>";
+			echo "<tr><td  bgcolor=$col>$pcode</td>$vline<td  bgcolor=$col><b>".$ahref.$pname.$aterm."</b></td></tr>";
+		}
         }
-        echo "<tr><td bgcolor=$col>$codea</td>";
-        echo "<td bgcolor=$col>";
+        echo "<tr><td bgcolor=$col>$codea</td>$vline";
+        echo "<td bgcolor=$col>&nbsp;";
         $aterm = "";
         $ahref = "";
         if (($row['subitem'] == 0 && ($magic == "A" || $magic == "K")) || $parent == 0) {
-        if ($parent > 0 || $parent < 0) {
-            $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
-            $aterm = "</a>";
-        } else if ($parent==0){
-            $ahref = "<a href='index.php?parent=".$row['id']."'>";
-            $aterm = "</a>";
+		if ($parent > 0 || $parent < 0) {
+		    $ahref ="<a href='index.php?parent=-2&parentfine=".$row['code']."'>";
+		    $aterm = "</a>";
+		} else if ($parent==0){
+		    $ahref = "<a href='index.php?parent=".$row['id']."'>";
+		    $aterm = "</a>";
+		}
         }
-        }
-        if ($row['subitem'] == 0 && $magic != "A" && $magic !="K" && $parent != 0) {
-                    $ahref ="<a href='index.php?parent=-2&parentmid=".$row['code']."'>";
+        
+	if ($row['subitem'] == 0 && $magic != "A" && $magic !="K" && $parent != 0) {
+            $ahref ="<a href='index.php?parent=-2&parentmid=".$row['code']."'>";
             $aterm = "</a>";
         }
         
@@ -340,6 +364,13 @@ if ($parent < 1 && ! $parentfine) {
       $amount1 = fmoney($row['amount1']);
       $amount2 = fmoney($row['amount2']);
       $amount3 = fmoney($row['amount3']);
+      $id0 = $row['id'];
+      $img = "edit_empty.png";
+      if (checkPage("ID_$id0")) {
+	$img = "edit_filled.png";
+      }
+      echo "<td bgcolor=$col>&nbsp;<a href=index.php?id=$id0><img src='img/$img'  border='0'></a>&nbsp;</td>";
+      
       if ($totalp) {
         $percent = ($row['amount1']/$totaluf)*100;
         $js .= "$(\"#pbar$cnt\").progressbar({
@@ -347,16 +378,24 @@ if ($parent < 1 && ! $parentfine) {
 		});
                 $(\"#pbar$cnt\").height(20);
                 ";
-        echo "<td bgcolor=$col><div id='pbar$cnt'></div>".number_format($percent,2)."</td>";  
+        echo "$vline<td bgcolor=$col><div id='pbar$cnt'></div>".number_format($percent,2)."</td>";  
       }
       
-  echo "<td align='right'  bgcolor=$col>".$amount1."</td>";
-  echo "<td align='right' bgcolor=$col>".$amount2."</td>";
-  echo "<td align='right' bgcolor=$col>".$amount3."</td>";
+  echo "$vline<td align='right'  bgcolor=$col>&nbsp;".$amount1."&nbsp;</td>";
+  echo "$vline<td align='right' bgcolor=$col>&nbsp;".$amount2."&nbsp;</td>";
+  echo "$vline<td align='right' bgcolor=$col>&nbsp;".$amount3."&nbsp;</td>";
   echo "</tr>";
     }
     echo "</table>";
 
+if ($id && $mediawiki) {
+?>
+
+<iframe src ="/mediawiki/index.php?title=ID_<? echo $id; ?>" width="100%" height="800">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+<?
+}
 
 ?>
     	
